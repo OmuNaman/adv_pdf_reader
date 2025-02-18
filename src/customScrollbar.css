@@ -1,0 +1,25 @@
+/* src/customScrollbar.css */
+.custom-scrollbar::-webkit-scrollbar {
+    width: 8px; /* Adjust the width as needed */
+  }
+  
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: #f1f1f1; /* Color of the track */
+  }
+  
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background: #888; /* Color of the scrollbar thumb */
+    border-radius: 4px; /* Rounded corners */
+  }
+  
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: #555; /* Color of the thumb on hover */
+  }
+  
+  
+  /* General styles for smoother scrolling */
+  .custom-scrollbar {
+    scrollbar-width: thin; /* Firefox */
+    scrollbar-color: #888 #f1f1f1; /* Firefox thumb and track color */
+    -webkit-overflow-scrolling: touch; /* iOS Safari for smooth scrolling */
+  }

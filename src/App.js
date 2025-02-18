@@ -1,5 +1,8 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Search, ZoomIn, ZoomOut, Highlighter, Pen, Hand, Download, ChevronLeft, ChevronRight, Upload } from 'lucide-react';
+import { Search, ZoomIn, ZoomOut, Highlighter, Pen, Hand, Download, Upload } from 'lucide-react';
+import { CirclePicker } from 'react-color'; // Install: npm install react-color
+import './App.css'; // Keep the existing App.css
+import './customScrollbar.css'; // Import custom scrollbar CSS
 
 const PDFReader = () => {
   const [scale, setScale] = useState(1);
@@ -9,11 +12,13 @@ const PDFReader = () => {
   const [annotations, setAnnotations] = useState([]);
   const [pdfFile, setPdfFile] = useState(null);
   const [numPages, setNumPages] = useState(null);
-  const [pdfText, setPdfText] = useState('');
+  const [pdfText, setPdfText] = useState('');  // Keep for potential text selection improvement
   const canvasRef = useRef(null);
   const fileInputRef = useRef(null);
   const [lastPosition, setLastPosition] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [color, setColor] = useState('#000'); // Default color for drawing/highlighting
+  const [fontSize, setFontSize] = useState(2); // Default line width for drawing
 
   const tools = [
     { id: 'cursor', icon: Hand, label: 'Select' },
@@ -96,6 +101,7 @@ const PDFReader = () => {
 
   const handleToolChange = (toolId) => {
     setTool(toolId);
+    setIsDrawing(false); // Stop drawing when tool changes
   };
 
   const handleZoom = (direction) => {
@@ -136,8 +142,8 @@ const PDFReader = () => {
     ctx.beginPath();
     ctx.moveTo(lastPosition.x, lastPosition.y);
     ctx.lineTo(currentPosition.x, currentPosition.y);
-    ctx.strokeStyle = '#2563eb';
-    ctx.lineWidth = 2;
+    ctx.strokeStyle = color;
+    ctx.lineWidth = fontSize;
     ctx.lineCap = 'round';
     ctx.stroke();
 
@@ -146,6 +152,14 @@ const PDFReader = () => {
 
   const stopDrawing = () => {
     setIsDrawing(false);
+  };
+
+  const handleColorChange = (newColor) => {
+    setColor(newColor.hex);
+  };
+
+  const handleFontSizeChange = (e) => {
+    setFontSize(parseInt(e.target.value));
   };
 
   return (
@@ -223,7 +237,7 @@ const PDFReader = () => {
                       : 'hover:bg-gray-100 text-gray-600'
                   }`}
                 >
-                  <ChevronLeft size={20} />
+                 
                 </button>
                 <span className="text-sm text-gray-600">
                   Page {currentPage} of {numPages}
@@ -237,7 +251,7 @@ const PDFReader = () => {
                       : 'hover:bg-gray-100 text-gray-600'
                   }`}
                 >
-                  <ChevronRight size={20} />
+                 
                 </button>
               </div>
             )}
@@ -257,9 +271,10 @@ const PDFReader = () => {
             </div>
           ) : (
             <div 
-              className="relative w-full overflow-auto"
+              className="relative w-full custom-scrollbar" // Added custom-scrollbar class
               style={{ 
                 maxHeight: '80vh',
+                overflowY: 'scroll', // Enable vertical scrolling
                 transformOrigin: 'top left'
               }}
             >
@@ -284,6 +299,29 @@ const PDFReader = () => {
             </div>
           )}
         </div>
+
+           {/* Color Picker and Font Size */}
+           {tool === 'pen' && (
+              <div className="bg-white rounded-b-xl shadow-lg p-4 mt-4 flex items-center justify-around">
+                <div>
+                  <label className="block text-gray-700 text-sm font-bold mb-2">
+                    Color:
+                  </label>
+                  <CirclePicker color={color} onChangeComplete={handleColorChange} />
+                </div>
+                <div>
+                  <label className="block text-gray-700 text-sm font-bold mb-2">
+                    Line Width:
+                  </label>
+                  <input
+                    type="number"
+                    value={fontSize}
+                    onChange={handleFontSizeChange}
+                    className="shadow appearance-none border rounded w-20 py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                  />
+                </div>
+              </div>
+            )}
       </div>
     </div>
   );
